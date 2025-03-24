@@ -1,0 +1,57 @@
+<div
+  style="
+    width: 15%;
+    min-height: 100vh;
+    background-color: #e0e4eb;
+    position: fixed;
+  "
+>
+  <div
+    class="list-group list-group-fill-su ccess"
+    style="
+      padding: 100px 0;
+      display: flex;
+      flex-direction: column;
+      margin: auto;
+      width: fit-content;
+    "
+  >
+    <ul
+      class="metismenu list-unstyled navbar-nav"
+      *ngFor="let item of menuItems"
+    >
+      <li style="cursor: pointer">
+        <a
+          class="list-group-item list-group-item-action"
+          style="
+            text-transform: capitalize;
+            border: none;
+            border-radius: 10px;
+            width: fit-content;
+            margin-bottom: 10px;
+            width: 150px;
+          "
+          [routerLink]="['/' + item.name.toLocaleLowerCase()]"
+          >{{ item.name }}</a
+        >
+      </li>
+    </ul>
+    <ul class="metismenu list-unstyled navbar-nav">
+      <li style="cursor: pointer">
+        <button
+          (click)="logout()"
+          class="list-group-item list-group-item-action badge-soft-danger"
+          style="
+            text-transform: capitalize;
+            border: none;
+            width: 50%;
+            border-radius: 10px;
+            width: 150px;
+          "
+        >
+          Logout
+        </button>
+      </li>
+    </ul>
+  </div>
+</div>

@@ -8,6 +8,9 @@
       "schematics": {
         "@schematics/angular:component": {
           "style": "scss"
+        },
+        "@schematics/angular:application": {
+          "strict": true
         }
       },
       "root": "",
@@ -20,9 +23,7 @@
             "outputPath": "dist/frontend",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js", "@angular/localize/init"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -32,7 +33,14 @@
               }
             ],
             "styles": [
-              "src/styles.scss"
+              "node_modules/shepherd.js/dist/css/shepherd.css",
+              "node_modules/flatpickr/dist/flatpickr.css",
+              "src/styles.scss",
+              "node_modules/@ctrl/ngx-emoji-mart/picker.css",
+              "node_modules/swiper/swiper-bundle.css",
+              "src/assets/scss/config/minimal/bootstrap.scss",
+              "src/assets/scss/config/minimal/app.scss",
+              "src/assets/scss/icons.scss"
             ],
             "scripts": []
           },
@@ -80,7 +88,8 @@
           "options": {
             "polyfills": [
               "zone.js",
-              "zone.js/testing"
+              "zone.js/testing",
+              "@angular/localize/init"
             ],
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
@@ -90,9 +99,7 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.scss"
-            ],
+            "styles": ["src/styles.scss"],
             "scripts": []
           }
         }
