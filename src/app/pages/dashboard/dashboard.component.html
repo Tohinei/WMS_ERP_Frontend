@@ -1,6 +1,16 @@
-<div>
-  <app-side-bar></app-side-bar>
-  <app-userList
-    style="float: right; width: 85%; background-color: #f0f1f5"
-  ></app-userList>
+<div class="container" style="margin: 10px">
+  <div
+    style="
+      width: 20%;
+      min-height: 95vh;
+      border-radius: 10px;
+      left: 10px;
+      position: fixed;
+    "
+  >
+    <app-side-bar></app-side-bar>
+  </div>
+  <div style="float: left; width: 100%; margin-left: 250px">
+    <router-outlet />
+  </div>
 </div>

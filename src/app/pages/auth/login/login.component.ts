@@ -8,16 +8,19 @@ import {
 } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Response } from '../../../models/response.model';
-import { SharedDataService } from '../../dashboard/services/shared-data/shared-data.service';
-import { UserService } from '../../dashboard/services/user/user.service';
-import { AuthService } from '../services/auth/auth.service';
 import Swal from 'sweetalert2';
-import { User } from '../../dashboard/models/user.model';
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { ToastsContainer } from '../../../shared/components/user-list/toasts-container.component';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, RouterModule, ReactiveFormsModule, CommonModule],
+  imports: [
+    FormsModule,
+    RouterModule,
+    ReactiveFormsModule,
+    CommonModule,
+    ToastsContainer,
+  ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
@@ -26,30 +29,46 @@ export class LoginComponent implements OnInit {
   fieldTextType!: boolean;
 
   constructor(
-    private formbuilder: FormBuilder,
+    private formBuilder: FormBuilder,
     private authService: AuthService,
-    private userService: UserService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.loginForm = this.formbuilder.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(4)]],
+    localStorage.clear();
+    this.initializeLoginForm();
+  }
+
+  private initializeLoginForm(): void {
+    this.loginForm = this.formBuilder.group({
+      email: ['wael.doe@example.com', [Validators.required, Validators.email]],
+      password: ['wael', Validators.required],
     });
   }
 
-  login() {
-    if (this.loginForm.invalid) return;
+  get f() {
+    return this.loginForm.controls;
+  }
 
+  login() {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      Swal.fire({
+        text: 'fill out all required fields',
+        icon: 'warning',
+      });
+      return;
+    }
     const { email, password } = this.loginForm.value;
 
-    this.authService.login({ email, password }).subscribe(
+    this.authService.signIn({ email, password }).subscribe(
       (res: any) => {
         localStorage.setItem('data', JSON.stringify(res));
-        this.router.navigate(['/dashboard']);
+        if (res.data.loggedUser.roleId == 1)
+          this.router.navigate(['/dashboard']);
+        else this.router.navigate(['/hasNoAcess']);
       },
-      (err) => Swal.fire({ text: 'Invalid credentials', icon: 'error' })
+      (err: Error) => Swal.fire({ text: 'Invalid credentials', icon: 'error' })
     );
   }
 

@@ -1,0 +1,324 @@
+<div style="min-height: 90vh; width: 110%;">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-title mb-0">Users</h4>
+        </div>
+        <div class="card-body">
+          <div id="customerList">
+            <div class="row g-4 mb-3">
+              <div class="col-sm-auto">
+                <div class="d-flex gap-1">
+                  <button
+                    type="button"
+                    class="btn btn-primary add-btn"
+                    data-bs-toggle="modal"
+                    id="create-btn"
+                    data-bs-target="#showModal"
+                    (click)="openModal(content)"
+                  >
+                    <i class="ri-add-line align-bottom me-1"></i> Add
+                  </button>
+                  <button
+                    class="btn btn-soft-danger"
+                    (click)="deleteMultiple(deleteModel)"
+                  >
+                    <i class="ri-delete-bin-2-line"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="col-sm">
+                <div class="d-flex justify-content-sm-end">
+                  <div class="search-box ms-2">
+                    <input
+                      type="text"
+                      class="form-control search"
+                      placeholder="Search..."
+                      [(ngModel)]="service.searchTerm"
+                    />
+                    <i class="ri-search-line search-icon"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="table-responsive table-card mt-3 mb-1">
+              <table class="table">
+                <thead>
+                  <tr class="bg-light text-muted">
+                    <th scope="col" style="width: 50px">
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          id="checkAll"
+                          value="option"
+                          [(ngModel)]="masterSelected"
+                          (change)="checkUncheckAll($event)"
+                        />
+                      </div>
+                    </th>
+                    <th class="sort" data-sort="userId">ID</th>
+                    <th class="sort" data-sort="fullName">Full Name</th>
+                    <th class="sort" data-sort="email">Email</th>
+                    <th class="sort" data-sort="roleId">Role ID</th>
+                    <th class="sort" data-sort="createdAt">Joining Date</th>
+                    <th class="sort">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let data of users" id="lj_{{ data.userId }}">
+                    <th scope="row">
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          name="checkAll"
+                          value="{{ data.userId }}"
+                          [(ngModel)]="data.state"
+                        />
+                      </div>
+                    </th>
+                    <td>
+                      <ngb-highlight
+                        [result]="data.userId"
+                        [term]="service.searchTerm"
+                      ></ngb-highlight>
+                    </td>
+                    <td>
+                      <ngb-highlight
+                        [result]="data.firstName"
+                        [term]="service.searchTerm"
+                      ></ngb-highlight>
+                      <span>&nbsp;</span>
+                      <ngb-highlight
+                        [result]="data.lastName"
+                        [term]="service.searchTerm"
+                      ></ngb-highlight>
+                    </td>
+                    <td>
+                      <ngb-highlight
+                        [result]="data.email"
+                        [term]="service.searchTerm"
+                      ></ngb-highlight>
+                    </td>
+                    <td>
+                      <ngb-highlight
+                        [result]="data.roleId"
+                        [term]="service.searchTerm"
+                      ></ngb-highlight>
+                    </td>
+                    <td>
+                      <ngb-highlight
+                        [result]="data.createdAt"
+                        [term]="service.searchTerm"
+                      ></ngb-highlight>
+                    </td>
+                    <td>
+                      <div class="d-flex gap-2">
+                        <div class="edit">
+                          <button
+                            class="btn btn-sm btn-primary edit-item-btn"
+                            data-bs-toggle="modal"
+                            data-bs-target="#showModal"
+                            (click)="editModal(content, data)"
+                          >
+                            Edit
+                          </button>
+                        </div>
+                        <div class="remove">
+                          <button
+                            class="btn btn-sm btn-success remove-item-btn"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteRecordModal"
+                            (click)="confirm(deleteModel, data.userId)"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="row justify-content-md-between align-items-md-center">
+              <div class="col col-sm-6">
+                <div
+                  class="dataTables_info mb-2"
+                  id="tickets-table_info"
+                  role="status"
+                  aria-live="polite"
+                >
+                  Showing
+                  {{ service.startIndex }} to {{ service.endIndex }} of
+                  {{ service.totalRecords }}
+                  entries
+                </div>
+              </div>
+              <div class="col col-sm-6">
+                <div class="text-sm-right float-end listjs-pagination">
+                  <ngb-pagination
+                    [collectionSize]="(total | async)!"
+                    [(page)]="service.page"
+                    [pageSize]="service.pageSize"
+                  >
+                  </ngb-pagination>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add User Modal -->
+<ng-template #content role="document" let-modal>
+  <div class="modal-header bg-light p-3">
+    <h5 class="modal-title" id="exampleModalLabel">Add User</h5>
+    <button
+      type="button"
+      class="btn-close"
+      data-bs-dismiss="modal"
+      aria-label="Close"
+      id="close-modal"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <form
+    (ngSubmit)="saveData()"
+    [formGroup]="userForm"
+    class="tablelist-form"
+    autocomplete="off"
+  >
+    <div class="modal-body">
+      <div>
+        <!-- col1 -->
+        <div>
+          <input
+            type="hidden"
+            name="userId"
+            value=""
+            formControlName="userId"
+          />
+          <div class="mb-3 form-floating">
+            <input
+              type="text"
+              id="firstName-field"
+              class="form-control"
+              placeholder="Enter first name"
+              required
+              formControlName="firstName"
+            />
+            <label for="firstName" class="form-label">First Name</label>
+          </div>
+          <div class="mb-3 form-floating">
+            <input
+              type="text"
+              id="lastName-field"
+              class="form-control"
+              placeholder="Enter last name"
+              required
+              formControlName="lastName"
+            />
+            <label for="lastName" class="form-label">Last Name</label>
+          </div>
+          <div class="mb-3 form-floating">
+            <input
+              type="email"
+              id="email-field"
+              class="form-control"
+              placeholder="Enter email"
+              required
+              formControlName="email"
+            />
+            <label for="email-field" class="form-label">Email</label>
+          </div>
+          <div class="mb-3 form-floating">
+            <input
+              type="password"
+              id="password-field"
+              class="form-control"
+              placeholder="Enter password"
+              required
+              formControlName="password"
+            />
+            <label for="password-field" class="form-label">Password</label>
+          </div>
+        </div>
+      </div>
+      <!-- col2 -->
+      <div>
+        <div class="mb-3">
+          <label for="roleId-field" class="form-label">Role ID</label>
+          <input
+            type="number"
+            id="roleId-field"
+            class="form-control"
+            placeholder="Enter Role ID"
+            required
+            formControlName="roleId"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="menuId-field" class="form-label">Menu ID</label>
+          <input
+            type="number"
+            id="menuId-field"
+            class="form-control"
+            placeholder="Enter Menu ID"
+            required
+            formControlName="menuId"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="hstack gap-2 justify-content-end">
+        <button
+          type="button"
+          class="btn btn-light"
+          data-bs-dismiss="modal"
+          (click)="modal.close('Close click')"
+        >
+          Close
+        </button>
+        <button type="submit" class="btn btn-success" id="add-btn">Add</button>
+      </div>
+    </div>
+  </form>
+</ng-template>
+
+<!-- Remove User Modal -->
+<ng-template #deleteModel let-modal>
+  <div class="modal-content">
+    <div class="modal-header">
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="modal"
+        aria-label="Close"
+        (click)="modal.dismiss('Cross click')"
+      ></button>
+    </div>
+    <div class="modal-body">
+      <h4>Are you sure you want to remove this user?</h4>
+      <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
+        <button
+          class="btn btn-link link-success"
+          data-bs-dismiss="modal"
+          (click)="modal.close('Close click')"
+        >
+          Close
+        </button>
+        <button class="btn btn-danger" (click)="deleteData(deleteId)">
+          Yes, Delete It!
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>

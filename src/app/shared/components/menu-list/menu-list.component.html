@@ -1,0 +1,223 @@
+<div style="min-height: 90vh; width: 110%">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-title mb-0">Menus</h4>
+        </div>
+        <div class="card-body">
+          <div id="menuList">
+            <div class="row g-4 mb-3">
+              <div class="col-sm-auto">
+                <div class="d-flex gap-1">
+                  <button
+                    type="button"
+                    class="btn btn-primary add-btn"
+                    id="create-btn"
+                    (click)="openModal(content)"
+                  >
+                    <i class="ri-add-line align-bottom me-1"></i> Add
+                  </button>
+                  <button
+                    class="btn btn-soft-danger"
+                    (click)="deleteMultiple(deleteModel)"
+                  >
+                    <i class="ri-delete-bin-2-line"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="col-sm">
+                <div class="d-flex justify-content-sm-end">
+                  <div class="search-box ms-2">
+                    <input
+                      type="text"
+                      class="form-control search"
+                      placeholder="Search..."
+                      [(ngModel)]="service.searchTerm"
+                    />
+                    <i class="ri-search-line search-icon"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="table-responsive table-card mt-3 mb-1">
+              <table class="table">
+                <thead>
+                  <tr class="bg-light text-muted">
+                    <th scope="col" style="width: 50px">
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          [(ngModel)]="masterSelected"
+                          (change)="checkUncheckAll($event)"
+                        />
+                      </div>
+                    </th>
+                    <th class="sort">ID</th>
+                    <th class="sort">Menu Name</th>
+                    <th class="sort">Description</th>
+                    <th class="sort">Created At</th>
+                    <th class="sort">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let menu of menus" id="lj_{{ menu.menuId }}">
+                    <th scope="row">
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          name="checkAll"
+                          [value]="menu.menuId"
+                          [(ngModel)]="menu.state"
+                        />
+                      </div>
+                    </th>
+                    <td>
+                      <ngb-highlight
+                        [result]="menu.menuId"
+                        [term]="service.searchTerm"
+                      ></ngb-highlight>
+                    </td>
+                    <td>
+                      <ngb-highlight
+                        [result]="menu.menuName"
+                        [term]="service.searchTerm"
+                      ></ngb-highlight>
+                    </td>
+                    <td>
+                      <ngb-highlight
+                        [result]="menu.description"
+                        [term]="service.searchTerm"
+                      ></ngb-highlight>
+                    </td>
+                    <td>
+                      <ngb-highlight
+                        [result]="menu.createdAt | date : 'short'"
+                        [term]="service.searchTerm"
+                      ></ngb-highlight>
+                    </td>
+                    <td>
+                      <div class="d-flex gap-2">
+                        <div class="edit">
+                          <button
+                            class="btn btn-sm btn-primary"
+                            (click)="editModal(content, menu)"
+                          >
+                            Edit
+                          </button>
+                        </div>
+                        <div class="remove">
+                          <button
+                            class="btn btn-sm btn-success"
+                            (click)="confirm(deleteModel, menu.menuId)"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="row justify-content-md-between align-items-md-center">
+              <div class="col col-sm-6">
+                <div class="dataTables_info mb-2">
+                  Showing {{ service.startIndex }} to {{ service.endIndex }} of
+                  {{ service.totalRecords }} entries
+                </div>
+              </div>
+              <div class="col col-sm-6">
+                <div class="text-sm-right float-end listjs-pagination">
+                  <ngb-pagination
+                    [collectionSize]="(total | async)!"
+                    [(page)]="service.page"
+                    [pageSize]="service.pageSize"
+                  ></ngb-pagination>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Menu Modal -->
+<ng-template #content let-modal>
+  <div class="modal-header bg-light p-3">
+    <h5 class="modal-title">Add Menu</h5>
+    <button
+      type="button"
+      class="btn-close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <form [formGroup]="menuForm" (ngSubmit)="saveData()">
+    <div class="modal-body">
+      <input type="hidden" formControlName="menuId" />
+      <div class="mb-3 form-floating">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Menu Name"
+          formControlName="menuName"
+          required
+        />
+        <label>Menu Name</label>
+      </div>
+      <div class="mb-3 form-floating">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="description"
+          formControlName="description"
+          required
+        />
+        <label>Description</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-light"
+        (click)="modal.close('Close click')"
+      >
+        Close
+      </button>
+      <button type="submit" class="btn btn-success" id="add-btn">Save</button>
+    </div>
+  </form>
+</ng-template>
+
+<!-- Delete Confirmation Modal -->
+<ng-template #deleteModel let-modal>
+  <div class="modal-content">
+    <div class="modal-header">
+      <button
+        type="button"
+        class="btn-close"
+        (click)="modal.dismiss('Cross click')"
+      ></button>
+    </div>
+    <div class="modal-body">
+      <h4>Are you sure you want to delete this menu?</h4>
+      <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
+        <button
+          class="btn btn-link link-success"
+          (click)="modal.close('Close click')"
+        >
+          Cancel
+        </button>
+        <button class="btn btn-danger" (click)="deleteData(deleteId)">
+          Yes, Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>
